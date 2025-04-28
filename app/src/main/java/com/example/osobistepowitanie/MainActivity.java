@@ -1,5 +1,4 @@
 package com.example.osobistepowitanie;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,23 +24,17 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-
 public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private Button button;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
         createNotificationChannel();
         editText = findViewById(R.id.editTextImie);
         button = findViewById(R.id.buttonPrzywitanie);
-
         button.setOnClickListener(v -> {
             if (editText.getText().toString().isEmpty()) {
                 Toast.makeText(MainActivity.this, "Proszę wpisać swoje imię!", Toast.LENGTH_SHORT).show();
@@ -49,39 +42,32 @@ public class MainActivity extends AppCompatActivity {
                 showAlertDialog();
             }
         });
-
-
     }
-
     private void showAlertDialog() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Potwierdzenie");
         builder.setMessage("Cześć " + editText.getText().toString() + "! Czy chcesz otrzymać powiadomienie powitalne?");
         builder.setPositiveButton("Tak, poproszę", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                DialogInterface.OnClickListener context = this; // Lub getApplicationContext()
-                String CHANNEL_ID = "DEFAULT_CHANNEL_ID"; // Musi pasować do ID utworzonego kanału
+                Toast.makeText(MainActivity.this, "Powiadomienie zostało wysłane!", Toast.LENGTH_SHORT).show();
+                DialogInterface.OnClickListener context = this;
+                String CHANNEL_ID = "DEFAULT_CHANNEL_ID";
                 int notificationId = 101;
-                Intent intent = new Intent(MainActivity.this, MainActivity.class); // Otwórz MainActivity
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 int flags = PendingIntent.FLAG_UPDATE_CURRENT;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    flags |= PendingIntent.FLAG_IMMUTABLE; // Dodaj flagę IMMUTABLE jeśli dostępna (API 23+)
+                    flags |= PendingIntent.FLAG_IMMUTABLE;
                 }
                 PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, intent, flags);
-
-
-// 3. Zbuduj powiadomienie używając NotificationCompat.Builder
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.claiste) // OBOWIĄZKOWA mała ikona
-                        .setContentTitle("Nowa Wiadomość")
-                        .setContentText("Otrzymałeś nową wiadomość od Anny.")
-                        .setPriority(NotificationCompat.PRIORITY_HIGH) // Ważność dla Android < 8.0 (dla 8.0+ decyduje kanał)
-                        .setContentIntent(pendingIntent) // Akcja po kliknięciu treści
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentTitle("Witaj!")
+                        .setContentText("Miło cię widzieć, "+editText.getText().toString()+"!")
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setContentIntent(pendingIntent)
                         .setAutoCancel(true);
-// 4. Pobierz NotificationManagerCompat
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(MainActivity.this);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) !=
@@ -92,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                     notificationManager.notify(notificationId, builder.build());
-
             }
         });
         builder.setNegativeButton("Nie, dziękuję", new DialogInterface.OnClickListener() {
